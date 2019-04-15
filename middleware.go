@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// MaxSizeAllowed限定了请求正文的大小至多为n(B),否则返回413
 func MaxSizeAllowed(n int64) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if n == -1 {

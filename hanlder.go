@@ -23,7 +23,7 @@ func convertHandler(c *gin.Context) {
 	if err != nil {
 		isCompress = false
 	}
-
+	// 将要转化为的文件类型
 	toFileType := c.Param("toFileType")
 	// 发送转化任务
 	err = uno.Send(toFileType, file, c.Writer, isCompress)

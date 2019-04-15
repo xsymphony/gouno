@@ -90,10 +90,10 @@ func (u *UnoTaskQueue) Send(toFileType string, r io.Reader, w io.Writer, isCompr
 }
 
 // Consume运行一个转化任务
-func (this *UnoTaskQueue) Consume() {
+func (u *UnoTaskQueue) Consume() {
 	for {
 		select {
-		case t := <-this.ch:
+		case t := <-u.ch:
 			t.Run()
 		}
 	}
