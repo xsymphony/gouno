@@ -5,7 +5,6 @@ import (
 )
 
 var uno *UnoTaskQueue
-var r *gin.Engine
 
 func init() {
 	initConfig()
@@ -13,11 +12,16 @@ func init() {
 }
 
 func main() {
-	r = gin.Default()
+	r := SetupRouter()
+	r.Run(":3000")
+}
+
+func SetupRouter() *gin.Engine {
+	r := gin.Default()
 	r.Use(MaxSizeAllowed(MAXSIZE))
 
 	r.GET("/", healthCheckHandler)
 	r.POST("/unoconv/:toFileType", convertHandler)
-
-	r.Run(":3000")
+	
+	return r
 }
