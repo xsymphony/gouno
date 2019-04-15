@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os/exec"
 	"time"
 )
@@ -16,21 +16,18 @@ import (
 // w:              输出重定向的位置（转化后的文件）
 // errMsgCh:       存储转化错误信息
 type Task struct {
-	fromFilePath string
-	toFileType   string
-	isCompress   bool
-	w            io.Writer
-	r            io.Reader
-	errMsgCh     chan error
+	w          io.Writer
+	r          io.Reader
+	toFileType string
+	isCompress bool
+	errMsgCh   chan error
 }
 
 func (t *Task) Run() {
 	var cmd *exec.Cmd
 	if t.isCompress {
-		// 压缩文件内容，输出重定向到标准输出
-		log.Printf("Will compress data for file: %s", t.fromFilePath)
+		// 压缩文件内容
 		cmd = exec.Command("/bin/unoconv",
-			"--debug", "-vvvv",
 			"-f", t.toFileType,
 			"-e", "UseLosslessCompression=false",
 			"-e", "ReduceImageResolution=false",
@@ -38,9 +35,8 @@ func (t *Task) Run() {
 			"--stdin",
 		)
 	} else {
-		// 不压缩文件，输出重定向到标准输出
+		// 不压缩文件
 		cmd = exec.Command("/bin/unoconv",
-			"--debug", "-vvvv",
 			"-f", t.toFileType,
 			"--stdout",
 			"--stdin",
@@ -49,7 +45,8 @@ func (t *Task) Run() {
 	// 输出重定向到转化任务的writer
 	cmd.Stdin = t.r
 	cmd.Stdout = t.w
-	cmd.Stderr = t.w
+	stderr := bytes.NewBufferString("Unoconv execute failed:\r\n")
+	cmd.Stderr = stderr
 
 	if err := cmd.Start(); err != nil {
 		t.errMsgCh <- err
@@ -61,6 +58,9 @@ func (t *Task) Run() {
 	// 如果转化超时则抛出异常
 	select {
 	case err := <-done:
+		if err != nil {
+			fmt.Println(stderr.String())
+		}
 		t.errMsgCh <- err
 	case <-time.After(TIMEOUT * time.Second):
 		t.errMsgCh <- errors.New(

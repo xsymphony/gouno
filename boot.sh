@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# 加载字体
 fc-cache -fv
-circusd /etc/circus/circus.ini
-#/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+
+/usr/local/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

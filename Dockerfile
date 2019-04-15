@@ -1,35 +1,40 @@
-FROM python:3.6.4-alpine3.6
+FROM ubuntu:xenial
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN  sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+     && apt-get clean \
+     && apt-get update --fix-missing
 
-ENV LC_ALL=en_US.UTF-8 \
-	LANG=en_US.UTF-8 \
-	LANGUAGE=en_US.UTF-8
-
-RUN apk add --no-cache \
-        --virtual .build-deps \
-        gcc \
-        g++ \
-        linux-headers \
-        libc-dev \
-    && apk add --no-cache \
-        libreoffice-common \
-        libreoffice-writer \
-        libreoffice-calc \
-        libreoffice-impress \
-    && pip install circus \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /root/.cache/ \
-    && apk del .build-deps
-
-COPY unoconv /bin/unoconv
-COPY circus.ini /etc/circus/circus.ini
-COPY boot.sh ./
-COPY gouno /go/bin/gouno
-RUN chmod 777 boot.sh \
-    && chmod +x /go/bin/gouno \
+RUN \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get upgrade -y \
+    && apt-get install --fix-missing -y \
+            python3-pip \
+            git \
+            locales \
+            libreoffice-common \
+            libreoffice-writer \
+            libreoffice-calc \
+            libreoffice-impress \
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    && pip3 install git+https://github.com/Supervisor/supervisor.git@master \
+    && git clone --branch=0.8 --depth=1 https://github.com/unoconv/unoconv.git \
+    && cp unoconv/unoconv /bin/unoconv \
     && chmod +x /bin/unoconv \
-    && ln -s /usr/bin/python3 /usr/bin/python
+    && rm -rf unoconv \
+    && apt-get -q -y remove libreoffice-gnome make git python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+RUN locale-gen de_DE.UTF-8
+ENV LANG=de_DE.UTF-8 \
+    LANGUAGE=de_DE:de \
+    LC_ALL=de_DE.UTF-8
+
+COPY gouno /go/bin/gouno
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY boot.sh ./
+RUN chmod 777 boot.sh
 
 EXPOSE 3000
 

@@ -10,7 +10,6 @@
 ├── Dockerfile
 ├── handler.go
 ├── main.go
-├── middleware.go
 ├── README.md
 ├── supervisord.conf     # supervisor配置文件，管理unoconv及gouno服务
 ├── unoconv.go           # 主要工具
@@ -48,7 +47,7 @@ docker build -t gouno .
 
 启动容器:
 ```
-docker run -name=gouno -d -p 127.0.0.1:3000:3000 -v /usr/share/fonts:/usr/share/fonts/extra gouno
+docker run -d -p 127.0.0.1:3000:3000 -e TIMEOUT=30 -e WORKER=5 -e MAXSIZE=-1 -v /usr/share/fonts:/usr/share/fonts/extra --name=gouno gouno
 ```
 
 ## 使用

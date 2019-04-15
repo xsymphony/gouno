@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -25,24 +24,16 @@ func convertHandler(c *gin.Context) {
 		isCompress = false
 	}
 
-	//tempfile, err := ioutil.TempFile(os.TempDir(), "gouno")
-	//ifExistErrorAbort400(c, err)
-	//defer tempfile.Close()
-	//
-	//_, err = io.Copy(tempfile, file)
-	//ifExistErrorAbort500(c, err)
-	//
-	//filename := tempfile.Name() + filepath.Ext(header.Filename)
-	//os.Rename(tempfile.Name(), filename)
-	//defer os.Remove(filename)
-
 	toFileType := c.Param("toFileType")
 	// 发送转化任务
 	err = uno.Send(toFileType, file, c.Writer, isCompress)
+	ifExistErrorAbort500(c, err)
+}
+
+func genericAbortCode(c *gin.Context, err error, code int) {
 	if err != nil {
-		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{
-			"code": http.StatusRequestEntityTooLarge,
+		c.AbortWithStatusJSON(code, gin.H{
+			"code": code,
 			"msg":  err.Error(),
 		})
 		return
@@ -50,21 +41,9 @@ func convertHandler(c *gin.Context) {
 }
 
 func ifExistErrorAbort400(c *gin.Context, err error) {
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"code": http.StatusBadRequest,
-			"msg":  err.Error(),
-		})
-		return
-	}
+	genericAbortCode(c, err, http.StatusBadRequest)
 }
 
 func ifExistErrorAbort500(c *gin.Context, err error) {
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"code": http.StatusInternalServerError,
-			"msg":  err.Error(),
-		})
-		return
-	}
+	genericAbortCode(c, err, http.StatusInternalServerError)
 }

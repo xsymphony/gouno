@@ -9,7 +9,5 @@ echo "\033[34m 当前文件目录是:$project_path \n 项目名称为:$project_n
 
 echo "\033[34m 开始构建容器并编译项目... \033[0m"
 
-sudo docker run --rm -e CGO_ENABLED=0 \
-                     -e GOOS=linux \
-                     -v "$project_path":/go/src/$project_name \
-                     -w /go/src/$project_name golang:1.8 go build -v -a -installsuffix cgo
+sudo docker run --rm -v "$project_path":/go/src/$project_name \
+                     -w /go/src/$project_name golang:1.8 go build -v
