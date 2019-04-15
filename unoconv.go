@@ -102,9 +102,7 @@ func (u *UnoTaskQueue) Consume() {
 // initUnconv初始化UnoTaskQueue，并开始n个worker持续执行转化任务
 func initUnoconv() *UnoTaskQueue {
 	uno := &UnoTaskQueue{ch: make(chan *Task, WORKER)}
-
 	startRunWorkers(WORKER, uno)
-
 	return uno
 }
 
