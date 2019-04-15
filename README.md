@@ -1,4 +1,11 @@
-# unoconv-service
+# gouno
+
+gouno封装了unoconv的操作，提供restful接口供转化文件，并且在unoconv基础上，额外提供了:
+
++ 基于Docker，快速安装并运行
++ 并行执行转化任务
++ 设置转化超时时间
++ 限制转化文件的大小
 
 ## 项目结构
 

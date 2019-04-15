@@ -20,7 +20,7 @@ func MaxSizeAllowed(n int64) gin.HandlerFunc {
 
 		if errRead != nil {
 			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{
-				"code": 413,
+				"code": http.StatusRequestEntityTooLarge,
 				"msg":  fmt.Sprintf("file is too large, more than %d B", n),
 			})
 			return
