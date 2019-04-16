@@ -15,9 +15,9 @@ func TestCalculateHash(t *testing.T) {
 		{"", "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU="},
 	}
 	for _, test := range tests {
-		r := CalculateHash(strings.NewReader(test.input))
+		r, _ := CalculateHash(strings.NewReader(test.input))
 		if r != test.output {
-			t.Errorf("CalculateHash('%s')->%s, But get: %s", test.input, test.output, r)
+			t.Errorf("CalculateHash([%s])->[%s], But get:[%s]", test.input, test.output, r)
 		}
 	}
 }

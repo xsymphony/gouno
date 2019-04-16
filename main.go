@@ -22,6 +22,7 @@ func SetupRouter() *gin.Engine {
 
 	r.GET("/", healthCheckHandler)
 	r.POST("/unoconv/:toFileType", convertHandler)
-	
+	r.POST("/cached/unoconv/:toFileType", convertWithCacheHandler)
+
 	return r
 }
