@@ -6,6 +6,7 @@ gouno封装了unoconv的操作，提供restful接口供转化文件，并且在u
 + 并行执行转化任务
 + 设置转化超时时间
 + 限制转化文件的大小
++ 可以缓存转化后的文件
 
 ## 项目结构
 
@@ -16,6 +17,7 @@ gouno封装了unoconv的操作，提供restful接口供转化文件，并且在u
 ├── config.go            # 存储配置信息
 ├── Dockerfile
 ├── handler.go
+├── middleware.go
 ├── main.go
 ├── README.md
 ├── supervisord.conf     # supervisor配置文件，管理unoconv及gouno服务
@@ -76,3 +78,10 @@ curl --form file=@example.docx --form "compress=1" http://127.0.0.1:3000/unoconv
     docx类型的转化为html效果最佳，docx类型的，依情况转化为pdf、html效果较好。
     
     更多转化规则，自行摸索。
+
+## 缓存转化的文件
+只需要改变上列的请求url，即可缓存转化结果：
+```
+curl --form file=@example.docx http://127.0.0.1:3000/cached/unoconv/pdf > example.pdf
+```
+gouno内容通过`sha256`算法计算文件内容，得出唯一的id，当命中缓存时，不再调用unoconv，而是直接返回缓存的文件。
